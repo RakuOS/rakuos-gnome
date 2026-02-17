@@ -1,0 +1,182 @@
+name: Build ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        required: true
+        type: choice
+        options:
+          - amd64
+          - arm64
+  pull_request:
+    branches:
+      - main
+    paths:
+      - './disk_config/disk.toml'
+      - './disk_config/iso.toml'
+      - './.github/workflows/build-disk.yml'
+
+env:
+  IMAGE_NAME: ${{ github.event.repository.name }}
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
+  DEFAULT_TAG: "latest"
+  BIB_IMAGE: "quay.io/centos-bootc/bootc-image-builder:latest"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build disk images
+    runs-on: ${{ inputs.platform == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        disk-type: ["anaconda-iso"]
+
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Prepare environment
+        run: |
+          USER_UID=$(id -u)
+          USER_GID=$(id -g)
+          DISK_TYPE=$(echo "${{ matrix.disk-type }}" | tr ' ' '-')
+          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
+          echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
+          echo "DISK_TYPE=${DISK_TYPE}" >> ${GITHUB_ENV}
+          echo "USER_UID=${USER_UID}" >> ${GITHUB_ENV}
+          echo "USER_GID=${USER_GID}" >> ${GITHUB_ENV}
+
+      - name: Install dependencies (ARM only)
+        if: inputs.platform == 'arm64'
+        run: |
+          sudo apt update -y
+          sudo apt install -y podman
+
+      - name: Maximize build space
+        if: inputs.platform != 'arm64'
+        uses: ublue-os/remove-unwanted-software@cc0becac701cf642c8f0a6613bbdaf5dc36b259e
+        with:
+          remove-codeql: true
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build disk images
+        id: build
+        uses: osbuild/bootc-image-builder-action@main
+        with:
+          builder-image: ${{ env.BIB_IMAGE }}
+          config-file: ${{ matrix.disk-type == 'anaconda-iso' && './disk_config/iso.toml' || './disk_config/disk.toml' }}
+          image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
+          chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
+          types: ${{ matrix.disk-type }}
+          additional-args: --use-librepo=True --rootfs ext4
+
+      # 🔥 Rename ISO with UTC date
+      - name: Rename ISO
+        if: github.event_name != 'pull_request'
+        run: |
+          cd ${{ steps.build.outputs.output-directory }}
+
+          BUILD_DATE=$(date -u +%Y.%m.%d)
+          ISO_PATH=$(find . -type f -name "*.iso" | head -n 1)
+          echo "Found ISO at $ISO_PATH"
+
+          NEW_NAME="rakuos-gnome-${BUILD_DATE}-${{ inputs.platform }}.iso"
+          mv "$ISO_PATH" "$NEW_NAME"
+
+          echo "NEW_ISO_NAME=$NEW_NAME" >> $GITHUB_ENV
+        shell: bash
+
+      # 🔥 Generate SHA256 for renamed ISO
+      - name: Generate SHA256 checksum
+        if: github.event_name != 'pull_request'
+        run: |
+          cd ${{ steps.build.outputs.output-directory }}
+          sha256sum "$NEW_ISO_NAME" > "$NEW_ISO_NAME.sha256"
+        shell: bash
+
+      # 📦 Upload artifacts to GitHub
+      - name: Upload disk images and checksum to Job Artifacts
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            ${{ steps.build.outputs.output-directory }}/${{ env.NEW_ISO_NAME }}
+            ${{ steps.build.outputs.output-directory }}/${{ env.NEW_ISO_NAME }}.sha256
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: true
+
+      # 🌐 Connect to ZeroTier
+      - name: Join ZeroTier Network
+        if: github.event_name != 'pull_request'
+        uses: zerotier/github-action@v1
+        with:
+          network_id: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          auth_token: ${{ secrets.ZEROTIER_CENTRAL_TOKEN }}
+
+      # ⏳ Wait for ZeroTier interface
+      - name: Wait for ZeroTier IP
+        if: github.event_name != 'pull_request'
+        run: |
+          sleep 10
+          ip addr show
+          ping -c 3 ${{ secrets.SFTP_HOST }}
+
+      # 🚀 Upload entire output folder but ignore manifest
+      - name: SFTP upload via ZeroTier
+        if: github.event_name != 'pull_request'
+        uses: Dylan700/sftp-upload-action@latest
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: 22
+          uploads: |
+            ${{ steps.build.outputs.output-directory }}/ => ${{ secrets.SFTP_TARGET }}/
+          ignore: |
+            manifest-anaconda-iso.json
+            bootiso
+
+      # 🔄 Update latest symlink + delete previous ISO + SHA256
+      - name: Cleanup old ISO + update latest symlink
+        if: github.event_name != 'pull_request'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          script: |
+            cd ${{ secrets.SFTP_TARGET }}
+
+            NEW="${{ env.NEW_ISO_NAME }}"
+            NEW_SHA="${NEW}.sha256"
+
+            LATEST_LINK="rakuos-gnome-latest-${{ inputs.platform }}.iso"
+            LATEST_SHA_LINK="${LATEST_LINK}.sha256"
+
+            OLD=$(readlink "$LATEST_LINK" || true)
+            OLD_SHA=$(readlink "$LATEST_SHA_LINK" || true)
+
+            # Update symlinks atomically
+            ln -sf "$NEW" "$LATEST_LINK"
+            ln -sf "$NEW_SHA" "$LATEST_SHA_LINK"
+
+            # Delete old ISO + checksum if they exist and are different
+            if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then
+              rm -f "$OLD"
+            fi
+
+            if [ -n "$OLD_SHA" ] && [ "$OLD_SHA" != "$NEW_SHA" ]; then
+              rm -f "$OLD_SHA"
+            fi

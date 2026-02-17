@@ -1,4 +1,4 @@
-name: Build disk images
+name: Build Live ISO
 
 on:
   workflow_dispatch:
