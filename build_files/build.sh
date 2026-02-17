@@ -39,10 +39,7 @@ dnf5 -y install @base-x @fonts @hardware-support \
   scx-manager
 
 ## Remove packages
-dnf5 -y remove plasma-discover-offline-updates \
-  plasma-discover-packagekit \
-  PackageKit-command-not-found
-
+#dnf5 -y remove 
 ## Enable Services
 systemctl enable sddm.service
 
