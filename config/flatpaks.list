@@ -1,0 +1,17 @@
+# Web browsers
+app/org.mozilla.firefox
+
+# GNOME apps
+app/org.gnome.Calculator
+app/org.gnome.Calendar
+app/org.gnome.TextEditor
+app/org.gnome.Loupe
+
+# Themes
+runtime/org.gtk.Gtk3theme.adw-gtk3
+runtime/org.gtk.Gtk3theme.adw-gtk3-dark
+
+# Themes
+runtime/org.gtk.Gtk3theme.Breeze
+
+# Development tools
