@@ -31,6 +31,7 @@ jobs:
   build:
     name: Build disk images
     runs-on: ${{ inputs.platform == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -79,14 +80,20 @@ jobs:
           types: ${{ matrix.disk-type }}
           additional-args: --use-librepo=True --rootfs ext4
 
-      # 🔥 Rename ISO to clean name
+      # 🔥 Rename ISO with UTC date
       - name: Rename ISO
         if: github.event_name != 'pull_request'
         run: |
           cd ${{ steps.build.outputs.output-directory }}
+
+          BUILD_DATE=$(date -u +%Y.%m.%d)
           ISO_PATH=$(find . -type f -name "*.iso" | head -n 1)
           echo "Found ISO at $ISO_PATH"
-          mv "$ISO_PATH" "rakuos-kde-${{ inputs.platform }}.iso"
+
+          NEW_NAME="rakuos-kde-${BUILD_DATE}-${{ inputs.platform }}.iso"
+          mv "$ISO_PATH" "$NEW_NAME"
+
+          echo "NEW_ISO_NAME=$NEW_NAME" >> $GITHUB_ENV
         shell: bash
 
       # 🔥 Generate SHA256 for renamed ISO
@@ -94,17 +101,17 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           cd ${{ steps.build.outputs.output-directory }}
-          sha256sum rakuos-kde-${{ inputs.platform }}.iso > rakuos-kde-${{ inputs.platform }}.iso.sha256
+          sha256sum "$NEW_ISO_NAME" > "$NEW_ISO_NAME.sha256"
         shell: bash
 
-      # Upload artifacts for debugging / CI history
+      # 📦 Upload artifacts to GitHub
       - name: Upload disk images and checksum to Job Artifacts
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           path: |
-            ${{ steps.build.outputs.output-directory }}/rakuos-kde-${{ inputs.platform }}.iso
-            ${{ steps.build.outputs.output-directory }}/rakuos-kde-${{ inputs.platform }}.iso.sha256
+            ${{ steps.build.outputs.output-directory }}/${{ env.NEW_ISO_NAME }}
+            ${{ steps.build.outputs.output-directory }}/${{ env.NEW_ISO_NAME }}.sha256
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -118,25 +125,58 @@ jobs:
           network_id: ${{ secrets.ZEROTIER_NETWORK_ID }}
           auth_token: ${{ secrets.ZEROTIER_CENTRAL_TOKEN }}
 
-      # ⏳ Wait for ZeroTier interface and test connectivity
+      # ⏳ Wait for ZeroTier interface
       - name: Wait for ZeroTier IP
         if: github.event_name != 'pull_request'
         run: |
-          echo "Waiting for ZeroTier interface..."
-          sleep 10  # give interface time to initialize
-          echo "ZeroTier IPs:"
+          sleep 10
           ip addr show
-          echo "Testing connectivity to homelab..."
-          ping -c 3 ${{secrets.SFTP_HOST}}
+          ping -c 3 ${{ secrets.SFTP_HOST }}
 
-      # 🚀 Upload ISO + checksum via SFTP
+      # 🚀 Upload entire output folder but ignore manifest
       - name: SFTP upload via ZeroTier
         if: github.event_name != 'pull_request'
         uses: Dylan700/sftp-upload-action@latest
         with:
-          server: ${{secrets.SFTP_HOST}}        # <-- ZeroTier IP of your homelab
-          username: ${{secrets.SFTP_USERNAME}}
-          password: ${{secrets.SFTP_PASSWORD}}
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
           port: 22
           uploads: |
-            ${{ steps.build.outputs.output-directory }}/ => ${{secrets.SFTP_TARGET}}/
+            ${{ steps.build.outputs.output-directory }}/ => ${{ secrets.SFTP_TARGET }}/
+          ignore: |
+            manifest-anaconda-iso.json
+            bootiso
+
+      # 🔄 Update latest symlink + delete previous ISO + SHA256
+      - name: Cleanup old ISO + update latest symlink
+        if: github.event_name != 'pull_request'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          script: |
+            cd ${{ secrets.SFTP_TARGET }}
+
+            NEW="${{ env.NEW_ISO_NAME }}"
+            NEW_SHA="${NEW}.sha256"
+
+            LATEST_LINK="rakuos-kde-latest-${{ inputs.platform }}.iso"
+            LATEST_SHA_LINK="${LATEST_LINK}.sha256"
+
+            OLD=$(readlink "$LATEST_LINK" || true)
+            OLD_SHA=$(readlink "$LATEST_SHA_LINK" || true)
+
+            # Update symlinks atomically
+            ln -sf "$NEW" "$LATEST_LINK"
+            ln -sf "$NEW_SHA" "$LATEST_SHA_LINK"
+
+            # Delete old ISO + checksum if they exist and are different
+            if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then
+              rm -f "$OLD"
+            fi
+
+            if [ -n "$OLD_SHA" ] && [ "$OLD_SHA" != "$NEW_SHA" ]; then
+              rm -f "$OLD_SHA"
+            fi
