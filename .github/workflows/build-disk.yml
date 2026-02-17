@@ -113,10 +113,10 @@ jobs:
       # 🌐 Connect to ZeroTier
       - name: Join ZeroTier Network
         if: github.event_name != 'pull_request'
-        uses: n0ts/zerotier-action@v1
+        uses: zerotier/github-action@v1
         with:
-          network-id: ${{ secrets.ZEROTIER_NETWORK }}
-          token: ${{ secrets.ZEROTIER_TOKEN }}
+          network_id: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          auth_token: ${{ secrets.ZEROTIER_CENTRAL_TOKEN }}
 
       # 🚀 Upload ISO + checksum via SFTP
       - name: SFTP upload
