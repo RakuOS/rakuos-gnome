@@ -21,28 +21,21 @@ set -ouex pipefail
 
 ## Install packages
 dnf5 -y install @base-x @fonts @hardware-support \
-  plasma-desktop \
-  plasma-workspace \
-  plasma-workspace-wayland \
-  sddm \
-  sddm-breeze \
-  konsole \
-  dolphin \
-  kwin \
-  kmenuedit \
-  plasma-nm \
-  plasma-pa \
-  kdegraphics-thumbnailers \
-  breeze-icon-theme \
-  breeze-gtk \
-  kde-gtk-config \
-  kcm_systemd \
-  kde-partitionmanager \
-  kwalletmanager5 \
-  kate \
-  ark \
-  spectacle \
-  plasma-discover \
+  gdm \
+  gnome-session \
+  gnome-shell \
+  gnome-control-center \
+  gnome-software \
+  nautilus \
+  gnome-terminal \
+  gnome-text-editor \
+  file-roller \
+  gnome-disk-utility \
+  gnome-system-monitor \
+  NetworkManager-bluetooth \
+  pipewire \
+  wireplumber \
+  xdg-desktop-portal-gnome \
   scx-manager
 
 ## Remove packages

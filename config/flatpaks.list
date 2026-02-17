@@ -4,6 +4,8 @@ app/org.mozilla.firefox
 # GNOME apps
 app/org.gnome.Calculator
 app/org.gnome.Calendar
+app/org.gnome.eog
+app/org.gnome.Evince
 app/org.gnome.TextEditor
 app/org.gnome.Loupe
 
