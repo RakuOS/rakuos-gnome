@@ -110,19 +110,22 @@ jobs:
           compression-level: 0
           overwrite: true
 
-      # 🚀 Create / Update rolling latest release
-      - name: Create or Update Latest Release
+      # 🌐 Connect to ZeroTier
+      - name: Join ZeroTier Network
         if: github.event_name != 'pull_request'
-        uses: softprops/action-gh-release@v2.5.0
+        uses: n0ts/zerotier-action@v1
         with:
-          tag_name: rakuos-kde-latest
-          name: "RakuOS KDE Latest"
-          draft: false
-          prerelease: false
-          generate_release_notes: false
-          overwrite: true
-          files: |
-            ${{ steps.build.outputs.output-directory }}/rakuos-kde-${{ inputs.platform }}.iso
-            ${{ steps.build.outputs.output-directory }}/rakuos-kde-${{ inputs.platform }}.iso.sha256
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          network-id: ${{ secrets.ZEROTIER_NETWORK }}
+          token: ${{ secrets.ZEROTIER_TOKEN }}
+
+      # 🚀 Upload ISO + checksum via SFTP
+      - name: Upload ISO and checksum via SFTP
+        if: github.event_name != 'pull_request'
+        run: |
+          cd ${{ steps.build.outputs.output-directory }}
+          sftp -o StrictHostKeyChecking=no ${{ secrets.SFTP_USERNAME }}@${{ secrets.SFTP_HOST }} <<EOF
+            put rakuos-kde-${{ inputs.platform }}.iso ${{ secrets.SFTP_TARGET_DIR }}/rakuos-kde-${{ inputs.platform }}.iso
+            put rakuos-kde-${{ inputs.platform }}.iso.sha256 ${{ secrets.SFTP_TARGET_DIR }}/rakuos-kde-${{ inputs.platform }}.iso.sha256
+            bye
+          EOF
+        shell: bash
