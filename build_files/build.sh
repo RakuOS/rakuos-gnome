@@ -41,7 +41,7 @@ dnf5 -y install @base-x @fonts @hardware-support \
 ## Remove packages
 #dnf5 -y remove 
 ## Enable Services
-systemctl enable sddm.service
+systemctl enable gdm.service
 
 ## Install bundled Flatpaks
 flatpak install -y flathub org.mozilla.firefox
