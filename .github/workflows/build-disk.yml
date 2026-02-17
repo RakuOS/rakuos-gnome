@@ -127,17 +127,19 @@ jobs:
           echo "ZeroTier IPs:"
           ip addr show
           echo "Testing connectivity to homelab..."
-          ping -c 3 172.30.215.53
+          ping -c 3 ${{secrets.SFTP_HOST}}
 
       # 🚀 Upload ISO + checksum via SFTP
       - name: SFTP upload via ZeroTier
         if: github.event_name != 'pull_request'
         uses: Dylan700/sftp-upload-action@latest
         with:
-          server: 172.30.215.53        # <-- ZeroTier IP of your homelab
+          server: ${{secrets.SFTP_HOST}}        # <-- ZeroTier IP of your homelab
           username: ${{secrets.SFTP_USERNAME}}
           password: ${{secrets.SFTP_PASSWORD}}
           port: 22
           uploads: |
-            ${{ steps.build.outputs.output-directory }}/rakuos-kde-${{ inputs.platform }}.iso => ${{secrets.SFTP_TARGET}}/
-            ${{ steps.build.outputs.output-directory }}/rakuos-kde-${{ inputs.platform }}.iso.sha256 => ${{secrets.SFTP_TARGET}}/
+            ${{ steps.build.outputs.output-directory }}/ => ${{secrets.SFTP_TARGET}}/
+          ignore: |
+            !rakuos-kde-${{ inputs.platform }}.iso
+            !rakuos-kde-${{ inputs.platform }}.iso.sha256
