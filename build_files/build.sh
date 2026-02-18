@@ -41,15 +41,17 @@ dnf5 -y install @base-x @fonts @hardware-support \
 ## Remove packages
 #dnf5 -y remove 
 
-## install flatpaks
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install -y --noninteractive flathub org.mozilla.firefox
-flatpak install -y --noninteractive flathub org.gnome.Calculator
-flatpak install -y --noninteractive flathub org.gnome.Calendar
-flatpak install -y --noninteractive flathub org.gnome.Evince
-flatpak install -y --noninteractive flathub org.gnome.Loupe
-flatpak install -y --noninteractive flathub org.gtk.Gtk3theme.adw-gtk3
-flatpak install -y --noninteractive flathub org.gtk.Gtk3theme.adw-gtk3-dark
+# Create Flatpak list
+cat << 'EOF' > /usr/share/rakuos/flatpaks.list
+# RakuOS KDE default apps
+org.mozilla.firefox
+org.gnome.Calculator
+org.gnome.Calendar
+org.gnome.Evince
+org.gnome.Loupe
+org.gtk.Gtk3theme.adw-gtk3
+org.gtk.Gtk3theme.adw-gtk3-dark
+EOF
 
 ## Enable Services
 systemctl enable gdm.service
