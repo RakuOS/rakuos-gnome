@@ -2,6 +2,7 @@
 
 set -ouex pipefail
 
+FEDORA_VERSION="${FEDORA_VERSION:-43}"
 ### Install packages
 
 # Packages can be installed from any enabled yum repo on the image.
