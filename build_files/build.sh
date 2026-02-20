@@ -42,17 +42,5 @@ dnf5 -y install @base-x @fonts @hardware-support \
 ## Remove packages
 #dnf5 -y remove 
 
-# Create Flatpak list
-cat << 'EOF' > /usr/share/rakuos/flatpaks.list
-# RakuOS KDE default apps
-org.mozilla.firefox
-org.gnome.Calculator
-org.gnome.Calendar
-org.gnome.Evince
-org.gnome.Loupe
-org.gtk.Gtk3theme.adw-gtk3
-org.gtk.Gtk3theme.adw-gtk3-dark
-EOF
-
 ## Enable Services
 systemctl enable gdm.service

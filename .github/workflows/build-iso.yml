@@ -12,16 +12,11 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - './disk_config/disk.toml'
-      - './disk_config/iso.toml'
-      - './.github/workflows/build-disk.yml'
 
 env:
   IMAGE_NAME: ${{ github.event.repository.name }}
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
   DEFAULT_TAG: "latest"
-  BIB_IMAGE: "quay.io/centos-bootc/bootc-image-builder:latest"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
@@ -68,31 +63,45 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Build disk images
-        id: build
-        uses: osbuild/bootc-image-builder-action@main
+      
+      # Docker requires lowercase registry references
+      - name: Lowercase Registry
+        id: registry_case
+        uses: ASzc/change-string-case-action@d0603cd0a7dd490be678164909f65c7737470a7f # v6
         with:
-          builder-image: ${{ env.BIB_IMAGE }}
-          config-file: ${{ matrix.disk-type == 'anaconda-iso' && './disk_config/iso.toml' || './disk_config/disk.toml' }}
-          image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
-          chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
-          types: ${{ matrix.disk-type }}
-          additional-args: --use-librepo=True --rootfs ext4
+          string: ${{ env.IMAGE_REGISTRY }}
+      
+      # 🔥 Build ISO using build-container-installer
+      - name: Build ISO
+        id: build
+        uses: jasonn3/build-container-installer@main
+        with:
+          arch: ${{ inputs.platform == 'amd64' && 'x86_64' || inputs.platform == 'arm64' && 'aarch64' || inputs.platform }}
+          image_name: ${{ env.IMAGE_NAME }}
+          image_repo: ${{ steps.registry_case.outputs.lowercase }}
+          variant: "Silverblue"                         # change per DE image
+          version: 43
+          image_tag: ${{ env.DEFAULT_TAG }}
+          iso_name: "${{ env.IMAGE_NAME }}-${{ env.DEFAULT_TAG }}-${{ inputs.platform }}.iso"
+          enable_cache_dnf: "false"
+          enable_cache_skopeo: "false"
+          flatpak_remote_refs_dir: "./installer/flatpaks/${{ inputs.platform }}" # your Flatpak list folder
+          enable_flatpak_dependencies: "true"
+          extra_boot_params: ""                      # optional kernel/boot parameters
+          additional_templates: "/github/workspace/installer/lorax_templates/remove_root_password_prompt.tmpl /github/workspace/installer/lorax_templates/set_default_user.tmpl"
+          repos: '/etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora-updates.repo'
+          web_ui: "false"
 
       # 🔥 Rename ISO with UTC date
       - name: Rename ISO
         if: github.event_name != 'pull_request'
         run: |
-          cd ${{ steps.build.outputs.output-directory }}
-
+          cd ${{ steps.build.outputs.iso_path }}
           BUILD_DATE=$(date -u +%Y.%m.%d)
           ISO_PATH=$(find . -type f -name "*.iso" | head -n 1)
           echo "Found ISO at $ISO_PATH"
-
           NEW_NAME="rakuos-gnome-${BUILD_DATE}-${{ inputs.platform }}.iso"
           mv "$ISO_PATH" "$NEW_NAME"
-
           echo "NEW_ISO_NAME=$NEW_NAME" >> $GITHUB_ENV
         shell: bash
 
@@ -100,7 +109,7 @@ jobs:
       - name: Generate SHA256 checksum
         if: github.event_name != 'pull_request'
         run: |
-          cd ${{ steps.build.outputs.output-directory }}
+          cd ${{ steps.build.outputs.iso_path }}
           sha256sum "$NEW_ISO_NAME" > "$NEW_ISO_NAME.sha256"
         shell: bash
 
@@ -110,8 +119,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: |
-            ${{ steps.build.outputs.output-directory }}/${{ env.NEW_ISO_NAME }}
-            ${{ steps.build.outputs.output-directory }}/${{ env.NEW_ISO_NAME }}.sha256
+            ${{ steps.build.outputs.iso_path }}/${{ env.NEW_ISO_NAME }}
+            ${{ steps.build.outputs.iso_path }}/${{ env.NEW_ISO_NAME }}.sha256
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -143,10 +152,24 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: 22
           uploads: |
-            ${{ steps.build.outputs.output-directory }}/ => ${{ secrets.SFTP_TARGET }}/
+            ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SFTP_TARGET }}/
           ignore: |
+            .git
+            .github
+            build_files
+            config
+            disk_config
+            flatpak.*
+            installer
+            .gitignore
             manifest-anaconda-iso.json
             bootiso
+            LICENSE
+            README.md
+            artifacthub-repo.yml
+            cosign.pub
+            *-CHECKSUM
+            Containerfile
 
       # 🔄 Update latest symlink + delete previous ISO + SHA256
       - name: Cleanup old ISO + update latest symlink
@@ -158,25 +181,13 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           script: |
             cd ${{ secrets.SFTP_TARGET }}
-
             NEW="${{ env.NEW_ISO_NAME }}"
             NEW_SHA="${NEW}.sha256"
-
             LATEST_LINK="rakuos-gnome-latest-${{ inputs.platform }}.iso"
             LATEST_SHA_LINK="${LATEST_LINK}.sha256"
-
             OLD=$(readlink "$LATEST_LINK" || true)
             OLD_SHA=$(readlink "$LATEST_SHA_LINK" || true)
-
-            # Update symlinks atomically
             ln -sf "$NEW" "$LATEST_LINK"
             ln -sf "$NEW_SHA" "$LATEST_SHA_LINK"
-
-            # Delete old ISO + checksum if they exist and are different
-            if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then
-              rm -f "$OLD"
-            fi
-
-            if [ -n "$OLD_SHA" ] && [ "$OLD_SHA" != "$NEW_SHA" ]; then
-              rm -f "$OLD_SHA"
-            fi
+            if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then rm -f "$OLD"; fi
+            if [ -n "$OLD_SHA" ] && [ "$OLD_SHA" != "$NEW_SHA" ]; then rm -f "$OLD_SHA"; fi
