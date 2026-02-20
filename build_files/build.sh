@@ -21,7 +21,7 @@ FEDORA_VERSION="${FEDORA_VERSION:-43}"
 # dnf5 -y copr disable ublue-os/staging
 
 ## Install packages
-dnf5 -y install @base-x @fonts @hardware-support \
+dnf5 -y install @fonts @hardware-support \
   gdm \
   gnome-session \
   gnome-shell \
