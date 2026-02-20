@@ -88,7 +88,7 @@ jobs:
           flatpak_remote_refs_dir: "./installer/flatpaks/${{ inputs.platform }}" # your Flatpak list folder
           enable_flatpak_dependencies: "true"
           extra_boot_params: ""                      # optional kernel/boot parameters
-          additional_templates: "/github/workspace/installer/lorax_templates/remove_root_password_prompt.tmpl /github/workspace/installer/lorax_templates/set_default_user.tmpl"
+          additional_templates: "/github/workspace/installer/lorax_templates/remove_root_password_prompt.tmpl"
           repos: '/etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora-updates.repo'
           web_ui: "false"
 
