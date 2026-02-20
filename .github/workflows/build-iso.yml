@@ -161,6 +161,7 @@ jobs:
             disk_config
             flatpak.*
             installer
+            system_files
             .gitignore
             manifest-anaconda-iso.json
             bootiso
