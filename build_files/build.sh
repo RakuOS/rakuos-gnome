@@ -27,6 +27,7 @@ dnf5 -y install @fonts @hardware-support \
   gnome-shell \
   gnome-control-center \
   gnome-software \
+  gnome-initial-setup \
   nautilus \
   gnome-terminal \
   gnome-text-editor \
