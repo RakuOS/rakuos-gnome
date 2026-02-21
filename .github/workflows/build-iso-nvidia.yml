@@ -1,4 +1,4 @@
-name: Build ISO
+name: Build Nvidia ISO
 
 on:
   workflow_dispatch:
@@ -77,12 +77,12 @@ jobs:
         uses: jasonn3/build-container-installer@main
         with:
           arch: ${{ inputs.platform == 'amd64' && 'x86_64' || inputs.platform == 'arm64' && 'aarch64' || inputs.platform }}
-          image_name: ${{ env.IMAGE_NAME }}
+          image_name: ${{ env.IMAGE_NAME }}-nvidia
           image_repo: ${{ steps.registry_case.outputs.lowercase }}
           variant: "Kinoite"                         # change per DE image
           version: 43
           image_tag: ${{ env.DEFAULT_TAG }}
-          iso_name: "${{ env.IMAGE_NAME }}-${{ env.DEFAULT_TAG }}-${{ inputs.platform }}.iso"
+          iso_name: "${{ env.IMAGE_NAME }}-nvidia-${{ env.DEFAULT_TAG }}-${{ inputs.platform }}.iso"
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
           flatpak_remote_refs_dir: "./installer/flatpaks/${{ inputs.platform }}" # your Flatpak list folder
@@ -100,7 +100,7 @@ jobs:
           BUILD_DATE=$(date -u +%Y.%m.%d)
           ISO_PATH=$(find . -type f -name "*.iso" | head -n 1)
           echo "Found ISO at $ISO_PATH"
-          NEW_NAME="rakuos-gnome-${BUILD_DATE}-${{ inputs.platform }}.iso"
+          NEW_NAME="rakuos-gnome-nvidia-${BUILD_DATE}-${{ inputs.platform }}.iso"
           mv "$ISO_PATH" "$NEW_NAME"
           echo "NEW_ISO_NAME=$NEW_NAME" >> $GITHUB_ENV
         shell: bash
@@ -186,7 +186,7 @@ jobs:
             cd ${{ secrets.SFTP_TARGET }}
             NEW="${{ env.NEW_ISO_NAME }}"
             NEW_SHA="${NEW}.sha256"
-            LATEST_LINK="rakuos-gnome-latest-${{ inputs.platform }}.iso"
+            LATEST_LINK="rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso"
             LATEST_SHA_LINK="${LATEST_LINK}.sha256"
             OLD=$(readlink "$LATEST_LINK" || true)
             OLD_SHA=$(readlink "$LATEST_SHA_LINK" || true)
