@@ -148,8 +148,8 @@ jobs:
           uploads: |
             ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SOURCEFORGE_LATEST_TARGET }}/
           ignore: |
-            ${{ steps.build.outputs.iso_path }}/${{ env.NEW_ISO_NAME }}
-            ${{ steps.build.outputs.iso_path }}/${{ env.NEW_ISO_NAME }}.sha256
+            ${{ env.NEW_ISO_NAME }}
+            ${{ env.NEW_ISO_NAME }}.sha256
             .git
             .github
             build_files
@@ -183,8 +183,8 @@ jobs:
           uploads: |
             ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SOURCEFORGE_DATED_TARGET }}/
           ignore: |
-            ${{ steps.build.outputs.iso_path }}/rakuos-gnome-latest-${{ inputs.platform }}.iso
-            ${{ steps.build.outputs.iso_path }}/rakuos-gnome-latest-${{ inputs.platform }}.iso.sha256
+            rakuos-gnome-latest-${{ inputs.platform }}.iso
+            rakuos-gnome-latest-${{ inputs.platform }}.iso.sha256
             .git
             .github
             build_files
@@ -234,7 +234,7 @@ jobs:
           uploads: |
             ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SFTP_TARGET }}/
           ignore: |
-            ${{ steps.build.outputs.iso_path }}/rakuos-gnome-latest-${{ inputs.platform }}.iso
+            rakuos-gnome-latest-${{ inputs.platform }}.iso
             .git
             .github
             build_files
