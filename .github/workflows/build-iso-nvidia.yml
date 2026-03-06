@@ -110,6 +110,7 @@ jobs:
           mv "$ISO_PATH" "$NEW_NAME"
           cp "$NEW_NAME" "rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso"
           echo "NEW_ISO_NAME=$NEW_NAME" >> $GITHUB_ENV
+          echo "BUILD_DATE=${BUILD_DATE}" >> $GITHUB_ENV
         shell: bash
 
       # 🔥 Generate SHA256 for renamed ISO
@@ -133,76 +134,6 @@ jobs:
           retention-days: 7
           compression-level: 0
           overwrite: true
-     
-      # # 🚀 Upload Latest Tagged ISO to Sourceforge
-      # - name: SFTP upload via ZeroTier
-      #   if: github.event_name != 'pull_request'
-      #   uses: Dylan700/sftp-upload-action@latest
-      #   with:
-      #     server: ${{ secrets.SOURCEFORGE_HOST }}
-      #     username: ${{ secrets.SOURCEFORGE_USERNAME }}
-      #     password: ${{ secrets.SOURCEFORGE_PASSWORD }}
-      #     port: 22
-      #     uploads: |
-      #       ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SOURCEFORGE_LATEST_TARGET }}/
-      #     ignore: |
-      #       ${{ env.NEW_ISO_NAME }}
-      #       ${{ env.NEW_ISO_NAME }}.sha256
-      #       .git
-      #       .github
-      #       build_files
-      #       config
-      #       disk_config
-      #       flatpak.*
-      #       installer
-      #       system_files
-      #       .gitignore
-      #       rakuos.repo
-      #       manifest-anaconda-iso.json
-      #       bootiso
-      #       LICENSE
-      #       README.md
-      #       CONTRIBUTING.md
-      #       artifacthub-repo.yml
-      #       cosign.pub
-      #       *-CHECKSUM
-      #       Containerfile
-      #       Containerfile.nvidia
-
-      # # 🚀 Upload Dated Tagged ISO to Sourceforge
-      # - name: SFTP upload via ZeroTier
-      #   if: github.event_name != 'pull_request'
-      #   uses: Dylan700/sftp-upload-action@latest
-      #   with:
-      #     server: ${{ secrets.SOURCEFORGE_HOST }}
-      #     username: ${{ secrets.SOURCEFORGE_USERNAME }}
-      #     password: ${{ secrets.SOURCEFORGE_PASSWORD }}
-      #     port: 22
-      #     uploads: |
-      #       ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SOURCEFORGE_DATED_TARGET }}/
-      #     ignore: |
-      #       rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso
-      #       rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso.sha256
-      #       .git
-      #       .github
-      #       build_files
-      #       config
-      #       disk_config
-      #       flatpak.*
-      #       installer
-      #       system_files
-      #       .gitignore
-      #       rakuos.repo
-      #       manifest-anaconda-iso.json
-      #       bootiso
-      #       LICENSE
-      #       README.md
-      #       CONTRIBUTING.md
-      #       artifacthub-repo.yml
-      #       cosign.pub
-      #       *-CHECKSUM
-      #       Containerfile
-      #       Containerfile.nvidia
 
       # 🌐 Connect to ZeroTier
       - name: Join ZeroTier Network
@@ -232,7 +163,6 @@ jobs:
           uploads: |
             ${{ steps.build.outputs.iso_path }}/ => ${{ secrets.SFTP_TARGET }}/
           ignore: |
-            rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso
             .git
             .github
             build_files
@@ -248,14 +178,31 @@ jobs:
             LICENSE
             README.md
             CONTRIBUTING.md
+            CONDUCT.md
             artifacthub-repo.yml
             cosign.pub
             *-CHECKSUM
             Containerfile
             Containerfile.nvidia
 
-      # 🔄 Update latest symlink + delete previous ISO + SHA256
-      - name: Cleanup old ISO + update latest symlink
+      # # 🔄 Update latest symlink + delete previous ISO + SHA256
+      # - name: Cleanup old ISO + update latest symlink
+      #   if: github.event_name != 'pull_request'
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.SFTP_HOST }}
+      #     username: ${{ secrets.SFTP_USERNAME }}
+      #     password: ${{ secrets.SFTP_PASSWORD }}
+      #     script: |
+      #       cd ${{ secrets.SFTP_TARGET }}
+      #       NEW="${{ env.NEW_ISO_NAME }}"
+      #       LATEST_LINK="rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso"
+      #       OLD=$(readlink "$LATEST_LINK" || true)
+      #       ln -sf "$NEW" "$LATEST_LINK"
+      #       if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then rm -f "$OLD"; fi
+
+      # 📤 Upload Nvidia ISOs to SourceForge
+      - name: Upload to SourceForge
         if: github.event_name != 'pull_request'
         uses: appleboy/ssh-action@v1
         with:
@@ -263,9 +210,4 @@ jobs:
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           script: |
-            cd ${{ secrets.SFTP_TARGET }}
-            NEW="${{ env.NEW_ISO_NAME }}"
-            LATEST_LINK="rakuos-gnome-nvidia-latest-${{ inputs.platform }}.iso"
-            OLD=$(readlink "$LATEST_LINK" || true)
-            ln -sf "$NEW" "$LATEST_LINK"
-            if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then rm -f "$OLD"; fi
+            sf-upload.sh --nvidia gnome ${{ env.BUILD_DATE }}
