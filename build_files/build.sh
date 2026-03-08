@@ -29,7 +29,6 @@ dnf5 -y install @fonts @hardware-support \
   gnome-backgrounds \
   gnome-control-center \
   gnome-software \
-  gnome-software-rpm-ostree \
   gnome-initial-setup \
   nautilus \
   gnome-console \
