@@ -13,7 +13,6 @@ dnf5 -y install @fonts @hardware-support \
   gnome-backgrounds \
   gnome-control-center \
   gnome-initial-setup \
-  nautilus \
   NetworkManager-bluetooth \
   pipewire \
   wireplumber \
