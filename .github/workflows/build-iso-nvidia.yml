@@ -75,7 +75,7 @@ jobs:
         id: setup-rakuos-repo
         shell: bash
         run: |
-          curl -Lo ${{ github.workspace }}/rakuos.repo https://download.opensuse.org/repositories/home:/tohur:/rakuos/Fedora_43/home:tohur:rakuos.repo
+          curl -Lo ${{ github.workspace }}/rakuos.repo https://copr.fedorainfracloud.org/coprs/tohur/RakuOS/repo/fedora-43/tohur-RakuOS-fedora-43.repo
 
       # 🔥 Build ISO using build-container-installer
       - name: Build ISO
