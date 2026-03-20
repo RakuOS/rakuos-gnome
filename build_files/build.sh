@@ -16,7 +16,8 @@ dnf5 -y install @fonts @hardware-support \
   NetworkManager-bluetooth \
   pipewire \
   wireplumber \
-  xdg-desktop-portal-gnome
+  xdg-desktop-portal-gnome \
+  gnome-shell-extension-appindicator
 
 ## Remove packages
 dnf5 -y remove gnome-software-rpm-ostree
