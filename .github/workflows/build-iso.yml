@@ -88,8 +88,6 @@ jobs:
           iso_name: "${{ env.IMAGE_NAME }}${{ matrix.variant == 'nvidia' && '-nvidia' || '' }}-${{ env.DEFAULT_TAG }}-${{ inputs.platform }}.iso"
           enable_cache_dnf: "false"
           enable_cache_skopeo: "false"
-          flatpak_remote_refs_dir: "./installer/flatpaks/${{ inputs.platform }}"
-          enable_flatpak_dependencies: "true"
           extra_boot_params: ""
           additional_templates: "/github/workspace/installer/lorax_templates/remove_spokes.tmpl"
           repos: '/github/workspace/rakuos.repo /etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora-updates.repo'
