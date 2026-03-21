@@ -22,5 +22,8 @@ dnf5 -y install @fonts @hardware-support \
 ## Remove packages
 dnf5 -y remove gnome-software-rpm-ostree
 
+## Compile GSettings schemas (picks up zz-rakuos-gnome.gschema.override)
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
 ## Enable Services
 systemctl enable gdm.service
