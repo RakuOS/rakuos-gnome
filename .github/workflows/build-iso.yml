@@ -149,6 +149,23 @@ jobs:
           ip addr show
           ping -c 3 ${{ secrets.SFTP_HOST }}
 
+      # 🗑️ Remove previous ISOs from server
+      - name: Remove previous ISOs from server
+        if: github.event_name != 'pull_request'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          script: |
+            SUFFIX=""
+            [[ "${{ matrix.variant }}" == "nvidia" ]] && SUFFIX="-nvidia"
+            cd "${{ secrets.SFTP_TARGET }}"
+            rm -f rakuos-gnome${SUFFIX}-[0-9]*-${{ inputs.platform }}.iso
+            rm -f rakuos-gnome${SUFFIX}-[0-9]*-${{ inputs.platform }}.iso.sha256
+            rm -f rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso
+            rm -f rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso.sha256
+
       # 🚀 Upload to SFTP
       - name: SFTP upload via ZeroTier
         if: github.event_name != 'pull_request'
