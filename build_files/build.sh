@@ -17,7 +17,8 @@ dnf5 -y install @fonts @hardware-support \
   pipewire \
   wireplumber \
   xdg-desktop-portal-gnome \
-  gnome-shell-extension-appindicator
+  gnome-shell-extension-appindicator \
+  rakuos-welcome-gtk
 
 ## Remove packages
 dnf5 -y remove gnome-software-rpm-ostree
