@@ -5,7 +5,7 @@ set -ouex pipefail
 FEDORA_VERSION="${FEDORA_VERSION:-43}"
 
 ## Install packages
-dnf5 -y install @fonts @hardware-support \
+dnf5.real -y install @fonts @hardware-support \
   gdm \
   gnome-session \
   gnome-shell \
@@ -21,7 +21,7 @@ dnf5 -y install @fonts @hardware-support \
   rakuos-welcome-gtk
 
 ## Remove packages
-dnf5 -y remove gnome-software-rpm-ostree
+dnf5.real -y remove gnome-software-rpm-ostree
 
 ## Compile GSettings schemas (picks up zz-rakuos-gnome.gschema.override)
 glib-compile-schemas /usr/share/glib-2.0/schemas/
