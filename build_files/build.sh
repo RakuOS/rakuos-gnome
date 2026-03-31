@@ -18,7 +18,8 @@ dnf5.real -y install @fonts @hardware-support \
   wireplumber \
   xdg-desktop-portal-gnome \
   gnome-shell-extension-appindicator \
-  rakuos-welcome-gtk
+  rakuos-welcome-gtk \
+  rakuos-software-gtk
 
 ## Remove packages
 dnf5.real -y remove gnome-software-rpm-ostree
