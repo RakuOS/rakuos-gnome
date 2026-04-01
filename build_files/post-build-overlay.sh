@@ -59,5 +59,25 @@ sed -i -e '$a\' /var/lib/rakuos/packages.list
 echo "[rakuos] overlay.state cleared — first boot will install all packages."
 echo "[rakuos] Post-build seed complete."
 
+echo "Appending GNOME protected packages to protected-packages.txt..."
+cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
+
+# GNOME DE packages (from rakuos-gnome/build_files/build.sh)
+gdm
+gnome-session
+gnome-shell
+gnome-settings-daemon
+gnome-backgrounds
+gnome-control-center
+gnome-initial-setup
+NetworkManager-bluetooth
+pipewire
+wireplumber
+xdg-desktop-portal-gnome
+gnome-shell-extension-appindicator
+rakuos-welcome-gtk
+rakuos-software-gtk
+EOF
+
 echo "Generating base file manifest..."
 /usr/libexec/rakuos/generate-base-manifest
