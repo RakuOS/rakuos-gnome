@@ -18,7 +18,8 @@ dnf5.real -y install @fonts @hardware-support \
   xdg-desktop-portal-gnome \
   gnome-shell-extension-appindicator \
   rakuos-welcome-gtk \
-  rakuos-software-gtk
+  rakuos-software-gtk \
+  rakuos-initial-setup-gtk
 
 ## Remove packages
 dnf5.real -y remove gnome-software-rpm-ostree gnome-tour
@@ -27,4 +28,5 @@ dnf5.real -y remove gnome-software-rpm-ostree gnome-tour
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 ## Enable Services
-systemctl enable gdm.service
+systemctl enable gdm.service \
+  rakuos-initial-setup.service
