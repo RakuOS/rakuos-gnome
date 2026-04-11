@@ -28,5 +28,4 @@ dnf5.real -y remove gnome-software-rpm-ostree gnome-tour
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 ## Enable Services
-systemctl enable gdm.service \
-  rakuos-initial-setup.service
+systemctl enable gdm.service
