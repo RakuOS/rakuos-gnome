@@ -1,4 +1,4 @@
-name: Build ISOs
+name: Build ISOs (test)
 
 on:
   #schedule:
