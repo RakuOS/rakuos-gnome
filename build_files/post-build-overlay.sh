@@ -77,7 +77,6 @@ xdg-desktop-portal-gnome
 gnome-shell-extension-appindicator
 rakuos-welcome-gtk
 rakuos-software-gtk
-rakuos-initial-setup-gtk
 EOF
 
 echo "Generating base file manifest..."

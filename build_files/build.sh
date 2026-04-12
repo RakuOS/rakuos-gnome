@@ -19,7 +19,7 @@ dnf5.real -y install @fonts @hardware-support \
   gnome-shell-extension-appindicator \
   rakuos-welcome-gtk \
   rakuos-software-gtk \
-  rakuos-initial-setup-gtk
+  gnome-initial-setup
 
 ## Remove packages
 dnf5.real -y remove gnome-software-rpm-ostree gnome-tour
