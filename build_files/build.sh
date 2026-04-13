@@ -19,6 +19,7 @@ dnf5.real -y install @fonts @hardware-support \
   gnome-shell-extension-appindicator \
   gnome-shell-extension-no-overview \
   gnome-shell-extension-dash-to-dock \
+  gnome-shell-extension-blur-my-shell \
   rakuos-welcome-gtk \
   rakuos-software-gtk
 
