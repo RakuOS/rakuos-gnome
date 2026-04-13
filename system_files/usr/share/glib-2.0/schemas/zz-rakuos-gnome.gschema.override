@@ -1,2 +1,6 @@
+[org.gnome.desktop.interface]
+color-scheme='prefer-dark'
+gtk-theme='Adwaita-dark'
+
 [org.gnome.shell]
 enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'no-overview@fthx', 'dash-to-dock@micxgx.gmail.com', 'blur-my-shell@aunetx']
