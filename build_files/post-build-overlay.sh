@@ -69,7 +69,6 @@ gnome-shell
 gnome-settings-daemon
 gnome-backgrounds
 gnome-control-center
-gnome-initial-setup
 NetworkManager-bluetooth
 pipewire
 wireplumber
