@@ -17,6 +17,7 @@ dnf5.real -y install @fonts @hardware-support \
   wireplumber \
   xdg-desktop-portal-gnome \
   gnome-shell-extension-appindicator \
+  gnome-shell-extension-no-overview \
   rakuos-welcome-gtk \
   rakuos-software-gtk
 
