@@ -1,2 +1,2 @@
 [org.gnome.shell]
-enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'no-overview@fthx']
+enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'no-overview@fthx', 'dash-to-dock@micxgx.gmail.com']
