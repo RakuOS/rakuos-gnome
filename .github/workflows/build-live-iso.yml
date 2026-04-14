@@ -1,4 +1,4 @@
-name: Build Live ISO
+name: Build Live ISO (testing)
 
 on:
   workflow_dispatch:
