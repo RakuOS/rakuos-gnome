@@ -47,6 +47,22 @@ jobs:
           echo "USER_UID=$(id -u)" >> ${GITHUB_ENV}
           echo "USER_GID=$(id -g)" >> ${GITHUB_ENV}
 
+      - name: Resolve branch
+        id: branch
+        env:
+          SOURCE_BRANCH: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          BRANCH_SLUG="$(echo "${SOURCE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
+          echo "branch_slug=${BRANCH_SLUG}" >> "$GITHUB_OUTPUT"
+          if [[ "${SOURCE_BRANCH}" == "${DEFAULT_BRANCH}" ]]; then
+            echo "image_tag=${{ env.DEFAULT_TAG }}" >> "$GITHUB_OUTPUT"
+            echo "is_stable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_tag=${BRANCH_SLUG}" >> "$GITHUB_OUTPUT"
+            echo "is_stable=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install dependencies (ARM only)
         if: inputs.platform == 'arm64'
         run: |
@@ -67,7 +83,7 @@ jobs:
         id: build
         uses: RakuOS/titanoboa@main
         with:
-          image-ref: ghcr.io/rakuos/${{ env.IMAGE_NAME }}${{ matrix.variant == 'nvidia' && '-nvidia' || '' }}:latest
+          image-ref: ghcr.io/rakuos/${{ env.IMAGE_NAME }}${{ matrix.variant == 'nvidia' && '-nvidia' || '' }}:${{ steps.branch.outputs.image_tag }}
           hook-post-rootfs: ${{ github.workspace }}/config/configure-iso.sh
           hook-pre-initramfs: ${{ github.workspace }}/config/pre_initramfs.sh
           compression: squashfs
@@ -81,10 +97,17 @@ jobs:
           BUILD_DATE=$(date -u +%Y.%m.%d)
           if [[ "${{ matrix.variant }}" == "nvidia" ]]; then SUFFIX="-nvidia"; else SUFFIX=""; fi
           mkdir -p output
-          NEW_NAME="rakuos-gnome${SUFFIX}-${BUILD_DATE}-${{ inputs.platform }}.iso"
+          if [[ "${{ steps.branch.outputs.is_stable }}" == "true" ]]; then
+            NEW_NAME="rakuos-gnome${SUFFIX}-${BUILD_DATE}-${{ inputs.platform }}.iso"
+            LATEST_NAME="rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso"
+          else
+            NEW_NAME="rakuos-gnome${SUFFIX}-${{ steps.branch.outputs.branch_slug }}-${BUILD_DATE}-${{ inputs.platform }}.iso"
+            LATEST_NAME="rakuos-gnome${SUFFIX}-${{ steps.branch.outputs.branch_slug }}-latest-${{ inputs.platform }}.iso"
+          fi
           mv ${{ steps.build.outputs.iso-dest }} output/${NEW_NAME}
-          cp output/${NEW_NAME} output/rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso
+          cp output/${NEW_NAME} output/${LATEST_NAME}
           echo "NEW_ISO_NAME=${NEW_NAME}" >> $GITHUB_ENV
+          echo "LATEST_ISO_NAME=${LATEST_NAME}" >> $GITHUB_ENV
           echo "BUILD_DATE=${BUILD_DATE}" >> $GITHUB_ENV
 
       # 🔥 Generate SHA256 checksums
@@ -95,14 +118,14 @@ jobs:
           if [[ "${{ matrix.variant }}" == "nvidia" ]]; then SUFFIX="-nvidia"; else SUFFIX=""; fi
           cd output
           sha256sum "$NEW_ISO_NAME" > "$NEW_ISO_NAME.sha256"
-          sha256sum "rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso" > "rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso.sha256"
+          sha256sum "$LATEST_ISO_NAME" > "$LATEST_ISO_NAME.sha256"
 
       # 📦 Upload artifacts to GitHub
       - name: Upload disk images and checksum to Job Artifacts
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: rakuos-gnome-${{ matrix.variant }}-${{ inputs.platform }}
+          name: rakuos-gnome-${{ steps.branch.outputs.branch_slug }}-${{ matrix.variant }}-${{ inputs.platform }}
           path: |
             output/${{ env.NEW_ISO_NAME }}
             output/${{ env.NEW_ISO_NAME }}.sha256
@@ -139,10 +162,15 @@ jobs:
             SUFFIX=""
             [[ "${{ matrix.variant }}" == "nvidia" ]] && SUFFIX="-nvidia"
             cd "${{ secrets.SFTP_TARGET }}"
-            rm -f rakuos-gnome${SUFFIX}-[0-9]*-${{ inputs.platform }}.iso
-            rm -f rakuos-gnome${SUFFIX}-[0-9]*-${{ inputs.platform }}.iso.sha256
-            rm -f rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso
-            rm -f rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso.sha256
+            if [[ "${{ steps.branch.outputs.is_stable }}" == "true" ]]; then
+              rm -f rakuos-gnome${SUFFIX}-[0-9]*-${{ inputs.platform }}.iso
+              rm -f rakuos-gnome${SUFFIX}-[0-9]*-${{ inputs.platform }}.iso.sha256
+              rm -f rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso
+              rm -f rakuos-gnome${SUFFIX}-latest-${{ inputs.platform }}.iso.sha256
+            else
+              rm -f rakuos-gnome${SUFFIX}-${{ steps.branch.outputs.branch_slug }}-*-${{ inputs.platform }}.iso
+              rm -f rakuos-gnome${SUFFIX}-${{ steps.branch.outputs.branch_slug }}-*-${{ inputs.platform }}.iso.sha256
+            fi
 
       # 🚀 Upload to SFTP
       - name: SFTP upload via ZeroTier
@@ -158,7 +186,7 @@ jobs:
 
       # 📤 Upload ISOs to SourceForge
       - name: Upload to SourceForge
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.branch.outputs.is_stable == 'true'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SFTP_HOST }}

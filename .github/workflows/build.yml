@@ -42,6 +42,36 @@ jobs:
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> $GITHUB_ENV
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
 
+      - name: Resolve branch
+        id: branch
+        env:
+          SOURCE_BRANCH: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.source_branch || github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          BRANCH_SLUG="$(echo "${SOURCE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
+          echo "source_branch=${SOURCE_BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "branch_slug=${BRANCH_SLUG}" >> "$GITHUB_OUTPUT"
+          if [[ "${SOURCE_BRANCH}" == "${DEFAULT_BRANCH}" ]]; then
+            {
+              echo "tag_lines<<EOF"
+              echo "type=raw,value=${{ env.DEFAULT_TAG }}"
+              echo "type=raw,value=${{ env.DEFAULT_TAG }}.{{date 'YYYYMMDD'}}"
+              echo "type=raw,value={{date 'YYYYMMDD'}}"
+              echo "type=sha,enable=${{ github.event_name == 'pull_request' }}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "version_label=${{ env.DEFAULT_TAG }}.{{date 'YYYYMMDD'}}" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "tag_lines<<EOF"
+              echo "type=raw,value=${BRANCH_SLUG}"
+              echo "type=raw,value=${BRANCH_SLUG}.{{date 'YYYYMMDD'}}"
+              echo "type=sha,enable=${{ github.event_name == 'pull_request' }}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "version_label=${BRANCH_SLUG}.{{date 'YYYYMMDD'}}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set variant variables
         run: |
           if [ "${{ matrix.variant }}" = "base" ]; then
@@ -53,6 +83,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.branch.outputs.source_branch }}
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v1
@@ -65,11 +97,7 @@ jobs:
         uses: docker/metadata-action@v5
         id: metadata
         with:
-          tags: |
-            type=raw,value=${{ env.DEFAULT_TAG }}
-            type=raw,value=${{ env.DEFAULT_TAG }}.{{date 'YYYYMMDD'}}
-            type=raw,value={{date 'YYYYMMDD'}}
-            type=sha,enable=${{ github.event_name == 'pull_request' }}
+          tags: ${{ steps.branch.outputs.tag_lines }}
           labels: |
             io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}/${{ github.sha }}/README.md
             org.opencontainers.image.created=${{ steps.date.outputs.date }}
@@ -79,7 +107,7 @@ jobs:
             org.opencontainers.image.title=${{ env.FINAL_IMAGE_NAME }}
             org.opencontainers.image.url=https://github.com/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}/tree/${{ github.sha }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
-            org.opencontainers.image.version=${{ env.DEFAULT_TAG }}.{{date 'YYYYMMDD'}}
+            org.opencontainers.image.version=${{ steps.branch.outputs.version_label }}
             io.artifacthub.package.deprecated=false
             io.artifacthub.package.keywords=${{ env.IMAGE_KEYWORDS }}
             io.artifacthub.package.license=Apache-2.0
@@ -100,7 +128,7 @@ jobs:
           oci: false
 
       - name: Login to GHCR
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -108,7 +136,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push to GHCR
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        if: github.event_name != 'pull_request'
         uses: redhat-actions/push-to-registry@v2
         with:
           registry: ${{ env.IMAGE_REGISTRY }}
@@ -124,12 +152,12 @@ jobs:
       # to consume. For more details, review the image signing section of the README.
       - name: Install Cosign
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        if: github.event_name != 'pull_request'
         with:
           cosign-release: 'v2.6.1'
 
       - name: Sign container image
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        if: github.event_name != 'pull_request'
         run: |
           IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ env.FINAL_IMAGE_NAME }}"
           for tag in ${{ steps.metadata.outputs.tags }}; do
