@@ -52,6 +52,12 @@ jobs:
           echo "source_branch=${SOURCE_BRANCH}" >> "$GITHUB_OUTPUT"
           echo "branch_slug=${BRANCH_SLUG}" >> "$GITHUB_OUTPUT"
           if [[ "${SOURCE_BRANCH}" == "${DEFAULT_BRANCH}" ]]; then
+            BASE_IMAGE_TAG="${{ env.DEFAULT_TAG }}"
+          else
+            BASE_IMAGE_TAG="${BRANCH_SLUG}"
+          fi
+          echo "base_image_tag=${BASE_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          if [[ "${SOURCE_BRANCH}" == "${DEFAULT_BRANCH}" ]]; then
             {
               echo "tag_lines<<EOF"
               echo "type=raw,value=${{ env.DEFAULT_TAG }}"
@@ -125,6 +131,8 @@ jobs:
           image: ${{ env.FINAL_IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+          build-args: |
+            BASE_IMAGE_TAG=${{ steps.branch.outputs.base_image_tag }}
           oci: false
 
       - name: Login to GHCR
