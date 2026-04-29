@@ -2,7 +2,7 @@
 
 set -ouex pipefail
 
-FEDORA_VERSION=$(rpm -E %fedora)
+CENTOS_VERSION=$(rpm -E %rhel)
 
 ## Install packages
 dnf5.real -y install @fonts @hardware-support \
