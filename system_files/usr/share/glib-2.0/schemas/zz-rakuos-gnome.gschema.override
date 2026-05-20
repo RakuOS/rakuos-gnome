@@ -1,6 +1,15 @@
 [org.gnome.desktop.interface]
 color-scheme='prefer-dark'
-gtk-theme='Adwaita-dark'
+gtk-theme='OrigamiPaper'
+
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/rakuos/default.jpg'
+picture-uri-dark='file:///usr/share/backgrounds/rakuos/default.jpg'
+picture-options='zoom'
+
+[org.gnome.desktop.screensaver]
+picture-uri='file:///usr/share/backgrounds/rakuos/default.jpg'
+picture-options='zoom'
 
 [org.gnome.shell]
 enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'no-overview@fthx', 'dash-to-dock@micxgx.gmail.com', 'blur-my-shell@aunetx']
