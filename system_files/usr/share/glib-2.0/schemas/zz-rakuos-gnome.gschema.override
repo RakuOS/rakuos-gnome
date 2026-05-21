@@ -1,6 +1,7 @@
 [org.gnome.desktop.interface]
 color-scheme='prefer-dark'
 gtk-theme='OrigamiPaper'
+icon-theme='WhiteSur-dark'
 cursor-theme='Bibata-Modern-Classic'
 
 [org.gnome.desktop.wm.preferences]
