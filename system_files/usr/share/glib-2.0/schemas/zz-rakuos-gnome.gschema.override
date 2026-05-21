@@ -3,6 +3,9 @@ color-scheme='prefer-dark'
 gtk-theme='OrigamiPaper'
 cursor-theme='Bibata-Modern-Classic'
 
+[org.gnome.desktop.wm.preferences]
+button-layout='appmenu:minimize,maximize,close'
+
 [org.gnome.desktop.background]
 picture-uri='file:///usr/share/backgrounds/rakuos/default.jpg'
 picture-uri-dark='file:///usr/share/backgrounds/rakuos/default.jpg'
