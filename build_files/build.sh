@@ -12,10 +12,23 @@ dnf5.real -y install @fonts @hardware-support \
   gnome-settings-daemon \
   gnome-backgrounds \
   gnome-control-center \
+  NetworkManager-adsl \
   NetworkManager-bluetooth \
+  NetworkManager-openconnect-gnome \
+  NetworkManager-openvpn-gnome \
+  NetworkManager-ppp \
+  NetworkManager-ssh-gnome \
+  NetworkManager-vpnc-gnome \
+  NetworkManager-wwan \
+  gnome-bluetooth \
+  systemd-oomd-defaults \
+  fprintd-pam \
   pipewire \
   wireplumber \
+  xdg-desktop-portal \
   xdg-desktop-portal-gnome \
+  xdg-desktop-portal-gtk \
+  xdg-user-dirs-gtk \
   gnome-shell-extension-appindicator \
   gnome-shell-extension-no-overview \
   gnome-shell-extension-dash-to-dock \
