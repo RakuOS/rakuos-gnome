@@ -34,6 +34,17 @@ dnf5.real -y install @fonts @hardware-support \
   gnome-shell-extension-dash-to-dock \
   gnome-shell-extension-blur-my-shell \
   rakuos-welcome-gtk \
+  gnome-calculator \
+  gnome-calendar \
+  gnome-console \
+  gnome-disk-utility \
+  nautilus \
+  evince \
+  loupe \
+  gnome-tweaks \
+  gnome-text-editor \
+  gnome-system-monitor \
+  file-roller \
   rakuos-software-gtk
 
 ## Remove packages
