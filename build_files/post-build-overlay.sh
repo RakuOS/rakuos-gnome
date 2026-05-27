@@ -57,11 +57,11 @@ prebake_overlay_from_installroot() {
     fi
 
     mapfile -t prebake_packages < <(
-        grep -v '^\s*#' "$PACKAGES_LIST" \
-        | grep -v '^\s*$' \
-        | sed 's/\s*#.*//' \
-        | tr -s ' \t' '\n' \
-        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' \
+        grep -v '^\s*#' "$PACKAGES_LIST"
+        | grep -v '^\s*$'
+        | sed 's/\s*#.*//'
+        | tr -s 't' '\n'
+        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
         | grep -v '^$'
     )
 
@@ -83,13 +83,13 @@ prebake_overlay_from_installroot() {
         cp -a "$IMAGE_PACKAGES_TOML" "$installroot/usr/lib/sysimage/libdnf5/packages.toml"
     fi
 
-    dnf5.real --config="$dnf_conf" \
-        --use-host-config \
-        --installroot="$installroot" \
-        --releasever="$releasever" \
-        --setopt=keepcache=1 \
-        --setopt=cachedir="$installroot/var/cache/libdnf5" \
-        --setopt=tsflags=noscripts \
+    dnf5.real --config="$dnf_conf"
+        --use-host-config
+        --installroot="$installroot"
+        --releasever="$releasever"
+        --setopt=keepcache=1
+        --setopt=cachedir="$installroot/var/cache/libdnf5"
+        --setopt=tsflags=noscripts
         install -y --refresh "${prebake_packages[@]}"
 
     echo "[rakuos] Copying prebaked /usr payload into overlay upper..."
@@ -148,19 +148,46 @@ echo "Appending GNOME protected packages to protected-packages.txt..."
 cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
 
 # GNOME DE packages (from rakuos-gnome/build_files/build.sh)
-gdm
-gnome-session
-gnome-shell
-gnome-settings-daemon
-gnome-backgrounds
-gnome-control-center
-NetworkManager-bluetooth
-pipewire
-wireplumber
-xdg-desktop-portal-gnome
-gnome-shell-extension-appindicator
-rakuos-welcome-gtk
-rakuos-software-gtk
+  gdm
+  gnome-session
+  gnome-shell
+  gnome-settings-daemon
+  gnome-backgrounds
+  gnome-control-center
+  NetworkManager-adsl
+  NetworkManager-bluetooth
+  NetworkManager-openconnect-gnome
+  NetworkManager-openvpn-gnome
+  NetworkManager-ppp
+  NetworkManager-ssh-gnome
+  NetworkManager-vpnc-gnome
+  NetworkManager-wwan
+  gnome-bluetooth
+  systemd-oomd-defaults
+  fprintd-pam
+  pipewire
+  wireplumber
+  xdg-desktop-portal
+  xdg-desktop-portal-gnome
+  xdg-desktop-portal-gtk
+  xdg-user-dirs-gtk
+  gnome-shell-extension-appindicator
+  gnome-shell-extension-no-overview
+  gnome-shell-extension-dash-to-dock
+  gnome-shell-extension-blur-my-shell
+  rakuos-welcome-gtk
+  gnome-calculator
+  gnome-calendar
+  gnome-console
+  gnome-disk-utility
+  nautilus
+  evince
+  loupe
+  gnome-tweaks
+  gnome-text-editor
+  gnome-system-monitor
+  file-roller
+  rakuos-software-gtk
 EOF
 
 echo "Generating base file manifest..."
