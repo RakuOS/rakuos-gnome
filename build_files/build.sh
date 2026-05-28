@@ -6,12 +6,32 @@ FEDORA_VERSION=$(rpm -E %fedora)
 
 ## Install packages
 dnf5.real -y install @fonts @hardware-support \
+  adw-gtk3-theme \
+  file-roller \
+  fprintd-pam \
   gdm \
-  gnome-session \
-  gnome-shell \
-  gnome-settings-daemon \
   gnome-backgrounds \
+  gnome-bluetooth \
+  gnome-calculator \
+  gnome-calendar \
+  gnome-console \
   gnome-control-center \
+  gnome-disk-utility \
+  gnome-session \
+  gnome-settings-daemon \
+  gnome-shell \
+  gnome-shell-extension-appindicator \
+  gnome-shell-extension-blur-my-shell \
+  gnome-shell-extension-dash-to-dock \
+  gnome-shell-extension-no-overview \
+  gnome-system-monitor \
+  gnome-text-editor \
+  gnome-tweaks \
+  gvfs-nfs \
+  ibus-mozc \
+  ibus-unikey \
+  loupe \
+  nautilus \
   NetworkManager-adsl \
   NetworkManager-bluetooth \
   NetworkManager-openconnect-gnome \
@@ -20,32 +40,16 @@ dnf5.real -y install @fonts @hardware-support \
   NetworkManager-ssh-gnome \
   NetworkManager-vpnc-gnome \
   NetworkManager-wwan \
-  gnome-bluetooth \
-  systemd-oomd-defaults \
-  fprintd-pam \
+  papers \
   pipewire \
+  rakuos-software-gtk \
+  rakuos-welcome-gtk \
+  systemd-oomd-defaults \
   wireplumber \
   xdg-desktop-portal \
   xdg-desktop-portal-gnome \
   xdg-desktop-portal-gtk \
-  xdg-user-dirs-gtk \
-  gnome-shell-extension-appindicator \
-  gnome-shell-extension-no-overview \
-  gnome-shell-extension-dash-to-dock \
-  gnome-shell-extension-blur-my-shell \
-  rakuos-welcome-gtk \
-  gnome-calculator \
-  gnome-calendar \
-  gnome-console \
-  gnome-disk-utility \
-  nautilus \
-  evince \
-  loupe \
-  gnome-tweaks \
-  gnome-text-editor \
-  gnome-system-monitor \
-  file-roller \
-  rakuos-software-gtk
+  xdg-user-dirs-gtk
 
 ## Remove packages
 dnf5.real -y remove gnome-software-rpm-ostree gnome-tour gnome-extensions-app
