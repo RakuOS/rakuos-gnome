@@ -187,6 +187,11 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   gnome-text-editor
   gnome-system-monitor
   file-roller
+  adw-gtk3-theme
+  gvfs-nfs
+  ibus-mozc
+  ibus-unikey
+  papers
   rakuos-software-gtk
 EOF
 
