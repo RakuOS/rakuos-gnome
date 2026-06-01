@@ -193,6 +193,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   ibus-unikey
   papers
   rakuos-software-gtk
+  scx-manager
 EOF
 
 echo "Generating base file manifest..."

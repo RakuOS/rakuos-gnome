@@ -44,6 +44,7 @@ dnf5.real -y install @fonts @hardware-support \
   pipewire \
   rakuos-software-gtk \
   rakuos-welcome-gtk \
+  scx-manager \
   systemd-oomd-defaults \
   wireplumber \
   xdg-desktop-portal \
