@@ -148,19 +148,52 @@ echo "Appending GNOME protected packages to protected-packages.txt..."
 cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
 
 # GNOME DE packages (from rakuos-gnome/build_files/build.sh)
-gdm
-gnome-session
-gnome-shell
-gnome-settings-daemon
-gnome-backgrounds
-gnome-control-center
-NetworkManager-bluetooth
-pipewire
-wireplumber
-xdg-desktop-portal-gnome
-gnome-shell-extension-appindicator
-rakuos-welcome-gtk
-rakuos-software-gtk
+  gdm
+  gnome-session
+  gnome-shell
+  gnome-settings-daemon
+  gnome-backgrounds
+  gnome-control-center
+  NetworkManager-adsl
+  NetworkManager-bluetooth
+  NetworkManager-openconnect-gnome
+  NetworkManager-openvpn-gnome
+  NetworkManager-ppp
+  NetworkManager-ssh-gnome
+  NetworkManager-vpnc-gnome
+  NetworkManager-wwan
+  gnome-bluetooth
+  systemd-oomd-defaults
+  fprintd-pam
+  pipewire
+  wireplumber
+  xdg-desktop-portal
+  xdg-desktop-portal-gnome
+  xdg-desktop-portal-gtk
+  xdg-user-dirs-gtk
+  gnome-shell-extension-appindicator
+  gnome-shell-extension-no-overview
+  gnome-shell-extension-dash-to-dock
+  gnome-shell-extension-blur-my-shell
+  rakuos-welcome-gtk
+  gnome-calculator
+  gnome-calendar
+  gnome-console
+  gnome-disk-utility
+  nautilus
+  evince
+  loupe
+  gnome-tweaks
+  gnome-text-editor
+  gnome-system-monitor
+  file-roller
+  adw-gtk3-theme
+  gvfs-nfs
+  ibus-mozc
+  ibus-unikey
+  papers
+  rakuos-software-gtk
+  scx-manager
 EOF
 
 echo "Generating base file manifest..."
