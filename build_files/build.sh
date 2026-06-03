@@ -14,7 +14,6 @@ dnf5.real -y install @fonts @hardware-support \
   gnome-bluetooth \
   gnome-calculator \
   gnome-calendar \
-  gnome-console \
   gnome-control-center \
   gnome-disk-utility \
   gnome-session \
@@ -42,6 +41,7 @@ dnf5.real -y install @fonts @hardware-support \
   NetworkManager-wwan \
   papers \
   pipewire \
+  ptyxis \
   rakuos-software-gtk \
   rakuos-welcome-gtk \
   scx-manager \

@@ -178,7 +178,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   rakuos-welcome-gtk
   gnome-calculator
   gnome-calendar
-  gnome-console
+  ptyxis
   gnome-disk-utility
   nautilus
   evince
