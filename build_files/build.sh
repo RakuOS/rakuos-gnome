@@ -36,7 +36,6 @@ dnf5.real -y install @fonts @hardware-support \
   NetworkManager-openconnect-gnome \
   NetworkManager-openvpn-gnome \
   NetworkManager-ppp \
-  NetworkManager-ssh-gnome \
   NetworkManager-vpnc-gnome \
   NetworkManager-wwan \
   papers \
