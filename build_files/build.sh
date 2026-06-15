@@ -5,8 +5,7 @@ set -ouex pipefail
 FEDORA_VERSION=$(rpm -E %fedora)
 
 ## Install packages
-dnf5.real -y install @fonts @hardware-support \
-  adw-gtk3-theme \
+dnf5.real -y install adw-gtk3-theme \
   file-roller \
   fprintd-pam \
   gdm \
