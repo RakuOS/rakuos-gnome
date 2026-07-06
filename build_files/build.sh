@@ -42,7 +42,6 @@ dnf5.real -y install adw-gtk3-theme \
   ptyxis \
   rakuos-software-gtk \
   rakuos-welcome-gtk \
-  scx-manager \
   systemd-oomd-defaults \
   wireplumber \
   xdg-desktop-portal \
