@@ -194,7 +194,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   papers
   rakuos-software-gtk
 EOF
-
+dnf5.real -y remove selinux-policy\* selinux-policy-targeted selinux-policy-devel policycoreutils-gui
 echo "Generating base file manifest..."
 /usr/libexec/rakuos/generate-base-manifest
 
