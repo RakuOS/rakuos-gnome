@@ -192,7 +192,9 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   ibus-mozc
   ibus-unikey
   papers
+  rakuos-release-gnome
   rakuos-software-gtk
+  rakuos-welcome-gtk
 EOF
 # Protect the akmods/rpm-build chain from getting autoremoved as "unused
 # deps" of selinux-policy — the chain itself (akmod-wl -> akmods -> rpm-build)
