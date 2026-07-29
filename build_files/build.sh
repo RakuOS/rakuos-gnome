@@ -40,6 +40,7 @@ dnf5.real -y install adw-gtk3-theme \
   papers \
   pipewire \
   ptyxis \
+  rakuos-release-gnome \
   rakuos-software-gtk \
   rakuos-welcome-gtk \
   systemd-oomd-defaults \
