@@ -4,6 +4,14 @@ set -ouex pipefail
 
 FEDORA_VERSION=$(rpm -E %fedora)
 
+# On the staging branch (RAKUOS_STAGING=1, set via --build-arg from CI)
+# install the staging os-release identity instead of the stable one, so
+# staging images identify themselves as "RakuOS GNOME Staging".
+RAKUOS_RELEASE_PKG="rakuos-release-gnome"
+if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
+    RAKUOS_RELEASE_PKG="rakuos-release-gnome-staging"
+fi
+
 ## Install packages
 dnf5.real -y install adw-gtk3-theme \
   file-roller \
@@ -40,7 +48,7 @@ dnf5.real -y install adw-gtk3-theme \
   papers \
   pipewire \
   ptyxis \
-  rakuos-release-gnome \
+  ${RAKUOS_RELEASE_PKG} \
   rakuos-software-gtk \
   rakuos-welcome-gtk \
   systemd-oomd-defaults \
