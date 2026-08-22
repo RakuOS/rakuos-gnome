@@ -13,7 +13,7 @@ if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
 fi
 
 ## Install packages
-dnf5.real -y install adw-gtk3-theme \
+rum install -y adw-gtk3-theme \
   file-roller \
   fprintd-pam \
   gdm \
@@ -59,7 +59,7 @@ dnf5.real -y install adw-gtk3-theme \
   xdg-user-dirs-gtk
 
 ## Remove packages
-dnf5.real -y remove gnome-software-rpm-ostree gnome-tour gnome-extensions-app
+rum remove -y gnome-software-rpm-ostree gnome-tour gnome-extensions-app
 
 ## Compile GSettings schemas (picks up zz-rakuos-gnome.gschema.override)
 glib-compile-schemas /usr/share/glib-2.0/schemas/
