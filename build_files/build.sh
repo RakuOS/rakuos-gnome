@@ -12,6 +12,11 @@ if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
     RAKUOS_RELEASE_PKG="rakuos-release-gnome-staging"
 fi
 
+# Terra ships disabled by default (third-party repos are opt-in), so enable
+# it here in case any packages below come from Terra; post-build.sh disables
+# it again before the image is finalized.
+rum config-manager --set-enabled terra
+
 ## Install packages
 rum install -y adw-gtk3-theme \
   file-roller \
