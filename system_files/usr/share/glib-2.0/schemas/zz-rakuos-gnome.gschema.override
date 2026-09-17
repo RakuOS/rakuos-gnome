@@ -1,7 +1,7 @@
 [org.gnome.desktop.interface]
 color-scheme='prefer-dark'
 gtk-theme='OrigamiPaper'
-icon-theme='WhiteSur-dark'
+icon-theme='Colloid-Dark'
 cursor-theme='Bibata-Modern-Classic'
 font-name='Inter 11'
 document-font-name='Inter 11'
