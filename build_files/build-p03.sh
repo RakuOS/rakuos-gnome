@@ -55,6 +55,7 @@ rum install -y adw-gtk3-theme \
   ptyxis \
   ${RAKUOS_RELEASE_PKG} \
   rakuos-software-gtk \
+  rakuos-system-gtk \
   rakuos-welcome-gtk \
   systemd-oomd-defaults \
   wireplumber \
