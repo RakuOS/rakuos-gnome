@@ -57,7 +57,6 @@ rum install -y adw-gtk3-theme \
   rakuos-software-gtk \
   rakuos-system-gtk \
   rakuos-welcome-gtk \
-  scx-manager \
   systemd-oomd-defaults \
   wireplumber \
   xdg-desktop-portal \
