@@ -21,7 +21,7 @@ rum config-manager --default --set-enabled terra
 rum config-manager --default --set-enabled $(cat /usr/share/rakuos/rpmfusion-default-repos)
 
 ## Install packages
-rum install -y adw-gtk3-theme \
+rum install -y --skip-broken --skip-unavailable adw-gtk3-theme \
   file-roller \
   fprintd-pam \
   gdm \
