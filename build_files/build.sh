@@ -66,7 +66,7 @@ rum install -y --skip-broken --skip-unavailable adw-gtk3-theme \
   NetworkManager-openconnect-gnome \
   NetworkManager-openvpn-gnome \
   NetworkManager-ppp \
-  NetworkManager-vpnc-gnome \
+  NetworkManager-libreswan-gnome \
   NetworkManager-wwan \
   papers \
   pipewire \

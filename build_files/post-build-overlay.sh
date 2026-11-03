@@ -128,7 +128,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   NetworkManager-openvpn-gnome
   NetworkManager-ppp
   NetworkManager-ssh-gnome
-  NetworkManager-vpnc-gnome
+  NetworkManager-libreswan-gnome
   NetworkManager-wwan
   gnome-bluetooth
   systemd-oomd-defaults
