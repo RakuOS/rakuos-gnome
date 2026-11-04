@@ -12,6 +12,21 @@ if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
     RAKUOS_RELEASE_PKG="rakuos-release-gnome-staging"
 fi
 
+# Same for RakuOS System: staging images install its -staging build (from
+# rakuos-system's staging branch), which provides the stable name.
+RAKUOS_SYSTEM_PKG="rakuos-system-gtk"
+if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
+    RAKUOS_SYSTEM_PKG="rakuos-system-staging-gtk"
+fi
+
+# And for the Software Center and the Welcome app.
+RAKUOS_SOFTWARE_PKG="rakuos-software-gtk"
+RAKUOS_WELCOME_PKG="rakuos-welcome-gtk"
+if [ "${RAKUOS_STAGING:-0}" = "1" ]; then
+    RAKUOS_SOFTWARE_PKG="rakuos-software-staging-gtk"
+    RAKUOS_WELCOME_PKG="rakuos-welcome-staging-gtk"
+fi
+
 # Terra ships disabled by default (third-party repos are opt-in), so enable
 # it here in case any packages below come from Terra; post-build.sh disables
 # it again before the image is finalized.
@@ -51,15 +66,15 @@ rum install -y --skip-broken --skip-unavailable adw-gtk3-theme \
   NetworkManager-openconnect-gnome \
   NetworkManager-openvpn-gnome \
   NetworkManager-ppp \
-  NetworkManager-vpnc-gnome \
+  NetworkManager-libreswan-gnome \
   NetworkManager-wwan \
   papers \
   pipewire \
   ptyxis \
   ${RAKUOS_RELEASE_PKG} \
-  rakuos-software-gtk \
-  rakuos-system-gtk \
-  rakuos-welcome-gtk \
+  ${RAKUOS_SOFTWARE_PKG} \
+  ${RAKUOS_SYSTEM_PKG} \
+  ${RAKUOS_WELCOME_PKG} \
   systemd-oomd-defaults \
   wireplumber \
   xdg-desktop-portal \
