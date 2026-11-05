@@ -42,6 +42,7 @@ rum install -y --skip-broken --skip-unavailable adw-gtk3-theme \
   gdm \
   gnome-backgrounds \
   gnome-bluetooth \
+  gnome-browser-connector \
   gnome-calculator \
   gnome-calendar \
   gnome-control-center \

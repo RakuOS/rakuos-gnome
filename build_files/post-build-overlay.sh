@@ -143,6 +143,7 @@ cat >> /usr/share/rakuos/protected-packages.txt << 'EOF'
   gnome-shell-extension-no-overview
   gnome-shell-extension-dash-to-dock
   gnome-shell-extension-blur-my-shell
+  gnome-browser-connector
   rakuos-welcome-gtk
   gnome-calculator
   gnome-calendar
