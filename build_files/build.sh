@@ -51,7 +51,6 @@ rum install -y --skip-broken --skip-unavailable adw-gtk3-theme \
   gnome-settings-daemon \
   gnome-shell \
   gnome-shell-extension-appindicator \
-  gnome-shell-extension-blur-my-shell \
   gnome-shell-extension-dash-to-dock \
   gnome-shell-extension-no-overview \
   gnome-system-monitor \

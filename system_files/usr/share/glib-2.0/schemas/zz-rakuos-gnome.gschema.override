@@ -20,4 +20,4 @@ picture-uri='file:///usr/share/backgrounds/rakuos/RakuOS-Chojiro.jpg'
 picture-options='zoom'
 
 [org.gnome.shell]
-enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'no-overview@fthx', 'dash-to-dock@micxgx.gmail.com', 'blur-my-shell@aunetx']
+enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'no-overview@fthx', 'dash-to-dock@micxgx.gmail.com']
