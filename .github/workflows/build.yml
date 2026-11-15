@@ -50,15 +50,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "gnome", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome", base_repo: "", extra: "", desc: "" }
+          - { name: "gnome", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome", base_repo: "quay.io/rakuos/rakuos-base", extra: "", desc: "" }
           - { name: "gnome-v4", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-v4", base_repo: "quay.io/rakuos/rakuos-base-v4", extra: "", desc: "" }
           - { name: "gnome-v3", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-v3", base_repo: "quay.io/rakuos/rakuos-base-v3", extra: "", desc: "" }
-          - { name: "gnome-nvidia", containerfile: "Containerfile.nvidia", repo: "quay.io/rakuos/rakuos-gnome-nvidia", base_repo: "", extra: "", desc: " (NVIDIA)" }
-          - { name: "gnome-nvidia-v4", containerfile: "Containerfile.nvidia", repo: "quay.io/rakuos/rakuos-gnome-nvidia-v4", base_repo: "quay.io/rakuos/rakuos-base-nvidia-v4", extra: "", desc: " (NVIDIA)" }
-          - { name: "gnome-nvidia-v3", containerfile: "Containerfile.nvidia", repo: "quay.io/rakuos/rakuos-gnome-nvidia-v3", base_repo: "quay.io/rakuos/rakuos-base-nvidia-v3", extra: "", desc: " (NVIDIA)" }
-          - { name: "gnome-nvidia-legacy", containerfile: "Containerfile.nvidia", repo: "quay.io/rakuos/rakuos-gnome-nvidia-legacy", base_repo: "quay.io/rakuos/rakuos-base-nvidia-legacy", extra: "", desc: " (NVIDIA legacy, 580xx)" }
-          - { name: "gnome-nvidia-legacy-v4", containerfile: "Containerfile.nvidia", repo: "quay.io/rakuos/rakuos-gnome-nvidia-legacy-v4", base_repo: "quay.io/rakuos/rakuos-base-nvidia-legacy-v4", extra: "", desc: " (NVIDIA legacy, 580xx)" }
-          - { name: "gnome-nvidia-legacy-v3", containerfile: "Containerfile.nvidia", repo: "quay.io/rakuos/rakuos-gnome-nvidia-legacy-v3", base_repo: "quay.io/rakuos/rakuos-base-nvidia-legacy-v3", extra: "", desc: " (NVIDIA legacy, 580xx)" }
+          - { name: "gnome-nvidia", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-nvidia", base_repo: "quay.io/rakuos/rakuos-base-nvidia", extra: "RAKUOS_GPU=nvidia", desc: " (NVIDIA)" }
+          - { name: "gnome-nvidia-v4", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-nvidia-v4", base_repo: "quay.io/rakuos/rakuos-base-nvidia-v4", extra: "RAKUOS_GPU=nvidia", desc: " (NVIDIA)" }
+          - { name: "gnome-nvidia-v3", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-nvidia-v3", base_repo: "quay.io/rakuos/rakuos-base-nvidia-v3", extra: "RAKUOS_GPU=nvidia", desc: " (NVIDIA)" }
+          - { name: "gnome-nvidia-legacy", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-nvidia-legacy", base_repo: "quay.io/rakuos/rakuos-base-nvidia-legacy", extra: "RAKUOS_GPU=nvidia", desc: " (NVIDIA legacy, 580xx)" }
+          - { name: "gnome-nvidia-legacy-v4", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-nvidia-legacy-v4", base_repo: "quay.io/rakuos/rakuos-base-nvidia-legacy-v4", extra: "RAKUOS_GPU=nvidia", desc: " (NVIDIA legacy, 580xx)" }
+          - { name: "gnome-nvidia-legacy-v3", containerfile: "Containerfile", repo: "quay.io/rakuos/rakuos-gnome-nvidia-legacy-v3", base_repo: "quay.io/rakuos/rakuos-base-nvidia-legacy-v3", extra: "RAKUOS_GPU=nvidia", desc: " (NVIDIA legacy, 580xx)" }
     steps:
       - uses: actions/checkout@v6
 
